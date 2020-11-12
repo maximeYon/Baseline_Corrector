@@ -874,7 +874,12 @@ while critere > (1*10^-result.PowerStopValue) && true == 1;
     
     weight = MINTABf(:,2);
     if result.SW == 1
-        fidgauss =fftshift(ifft(spectrecorr)).*gausswin(size(spectrecorr,1),size(spectrecorr,1)/50);
+        
+        %Gaussian broadening
+        gauss_creation = @(x,mu,sig,amp,vo)amp*exp(-(((x-mu).^2)/(2*sig.^2)))+vo;
+        gauss_b = (gauss_creation(1:size(spectrecorr,1),(size(spectrecorr,1)/2)+0.5,25,1,0))';
+        fidgauss =fftshift(ifft(spectrecorr)).*gauss_b;
+        %         fidgauss =fftshift(ifft(spectrecorr)).*gausswin(size(spectrecorr,1),size(spectrecorr,1)/50);
         spectregauss = fft(fftshift(fidgauss));
         weight0 = abs(spectregauss);
         weight0 = weight0/max(weight0)*9 + 1;
@@ -971,7 +976,7 @@ while critere > (1*10^-result.PowerStopValue) && true == 1;
     plot(frq,spectrecorr,'Color',[0 0 1],'Parent',result.handles.AffichageSpectre);
     plot(frq,valfit,'Color',[1 0 0],'Parent',result.handles.AffichageSpectre);
     plot(MINTABf(:,1),MINTABf(:,2),'Color',[1 0 0],'Marker','.','linestyle','none','Parent',result.handles.AffichageSpectre)
-%     plot(MINTABf(:,1),weightdis,'Color',[0 1 0],'Marker','.','linestyle','none','Parent',result.handles.AffichageSpectre)
+    %     plot(MINTABf(:,1),weightdis,'Color',[0 1 0],'Marker','.','linestyle','none','Parent',result.handles.AffichageSpectre)
     hold off
     set(result.handles.AffichageSpectre,'ylim',[min(spectrecorr) max(spectrecorr)/5]);
     set(result.handles.AffichageSpectre,'xlim',[min(frq) max(frq)]);
